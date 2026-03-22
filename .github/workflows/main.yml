@@ -2,12 +2,12 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # Dispara quando você cria uma tag começando com 'v'
 
 jobs:
   publish-tauri:
     permissions:
-      contents: write
+      contents: write # Necessário para criar o Release e subir os arquivos
     strategy:
       fail-fast: false
       matrix:
@@ -17,20 +17,26 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: setup node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm' # Cache agiliza os próximos builds
 
-      - name: install Rust stable
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: install frontend dependencies
+      - name: Install frontend dependencies
         run: npm install
 
-      - name: Build and Release
+      # ADICIONADO: Build do frontend antes do Tauri assumir
+      - name: Build frontend
+        run: npm run build 
+
+      - name: Build and Release (Tauri Action)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
