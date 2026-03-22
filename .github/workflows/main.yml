@@ -2,9 +2,8 @@ name: Release
 on:
   push:
     branches:
-      - main # O build vai começar toda vez que você der push na branch main
-    tags:
-      - 'v*' # Também continua funcionando para quando você criar tags
+      - main # Dispara o build assim que você salvar o arquivo
+  workflow_dispatch: # Cria o botão manual na aba Actions
 
 jobs:
   publish-tauri:
@@ -44,9 +43,9 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: 'v${{ github.run_number }}' # Cria uma tag automática com o número do build
+          tagName: 'build-${{ github.run_number }}'
           releaseName: 'Trauso Build ${{ github.run_number }}'
-          releaseBody: 'Build gerado automaticamente via GitHub Actions.'
+          releaseBody: 'Build gerado automaticamente.'
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
